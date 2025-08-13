@@ -27,11 +27,13 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
-COPY requirements.txt .
+COPY requirements.txt requirements-docker.txt ./
 
-# Install Python dependencies
+# Install Python dependencies with better error handling
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt || \
+    (echo "Falling back to Docker-optimized requirements..." && \
+     pip install --no-cache-dir -r requirements-docker.txt)
 
 # Copy application code
 COPY . .

@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: hosting_panel_postgres
+    environment:
+      POSTGRES_DB: hosting_panel
+      POSTGRES_USER: hosting_user
+      POSTGRES_PASSWORD: hosting_password_123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: hosting_panel_redis
+    command: redis-server --appendonly yes --requirepass redis_password_123
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # Main Hosting Panel Application
+  hosting_panel:
+    build: .
+    container_name: hosting_panel_app
+    environment:
+      DATABASE_URL: postgresql://hosting_user:hosting_password_123@postgres:5432/hosting_panel
+      REDIS_URL: redis://:redis_password_123@redis:6379
+      HOST: 0.0.0.0
+      PORT: 8000
+      DEBUG: true
+      SECRET_KEY: your-super-secret-key-change-this-in-production
+      ADMIN_USERNAME: admin
+      ADMIN_EMAIL: admin@localhost
+      ADMIN_PASSWORD: admin123
+      BASE_DIR: /var/www
+      BACKUP_PATH: /var/backups/hosting-panel
+      DOCKER_ENABLED: true
+      DOCKER_SOCKET: /var/run/docker.sock
+      ALLOWED_HOSTS: "*"
+      WEB_SERVER: nginx
+      PHP_VERSIONS: "7.4,8.0,8.1,8.2"
+      DEFAULT_PHP_VERSION: "8.1"
+      SSL_PROVIDER: letsencrypt
+      CERTBOT_EMAIL: admin@localhost
+      MONITORING_ENABLED: true
+      MONITORING_INTERVAL: 60
+      EMAIL_ENABLED: false
+      DNS_ENABLED: false
+      BACKUP_ENABLED: true
+      BACKUP_RETENTION_DAYS: 30
+    volumes:
+      - ./app:/app/app:ro
+      - ./main.py:/app/main.py:ro
+      - ./requirements.txt:/app/requirements.txt:ro
+      - website_data:/var/www
+      - backup_data:/var/backups/hosting-panel
+      - log_data:/var/log/hosting-panel
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  website_data:
+  backup_data:
+  log_data:
