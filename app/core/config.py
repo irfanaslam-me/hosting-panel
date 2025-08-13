@@ -29,6 +29,25 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_HOSTS: List[str] = ["*"]
     
+    @validator("ALLOWED_HOSTS", pre=True)
+    def parse_allowed_hosts(cls, v):
+        if isinstance(v, str):
+            # Handle string input like "['*']" or "*" or "host1,host2"
+            if v.startswith('[') and v.endswith(']'):
+                # Parse list-like string "['*']" -> ["*"]
+                import ast
+                try:
+                    return ast.literal_eval(v)
+                except:
+                    pass
+            elif ',' in v:
+                # Parse comma-separated string "host1,host2" -> ["host1", "host2"]
+                return [host.strip() for host in v.split(',')]
+            else:
+                # Single host string "*" -> ["*"]
+                return [v]
+        return v
+    
     # File paths
     BASE_DIR: str = "/var/www"
     NGINX_CONF_DIR: str = "/etc/nginx/sites-available"
@@ -40,6 +59,16 @@ class Settings(BaseSettings):
     WEB_SERVER: str = "nginx"  # nginx or apache
     PHP_VERSIONS: List[str] = ["7.4", "8.0", "8.1", "8.2"]
     DEFAULT_PHP_VERSION: str = "8.1"
+    
+    @validator("PHP_VERSIONS", pre=True)
+    def parse_php_versions(cls, v):
+        if isinstance(v, str):
+            # Handle string input like "7.4,8.0,8.1,8.2"
+            if ',' in v:
+                return [version.strip() for version in v.split(',')]
+            else:
+                return [v]
+        return v
     
     # SSL settings
     CERTBOT_EMAIL: Optional[str] = None
