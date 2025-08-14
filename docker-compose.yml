@@ -122,6 +122,21 @@ services:
       timeout: 10s
       retries: 3
 
+  # Frontend Application
+  frontend:
+    build: ./frontend
+    container_name: hosting_panel_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://hosting_panel_app:8000
+    depends_on:
+      - hosting_panel
+    networks:
+      - hosting_network
+    restart: unless-stopped
+
   # Nginx Reverse Proxy (Optional - for production use)
   nginx:
     image: nginx:alpine
@@ -136,6 +151,7 @@ services:
       - website_data:/var/www
     depends_on:
       - hosting_panel
+      - frontend
     networks:
       - hosting_network
     restart: unless-stopped

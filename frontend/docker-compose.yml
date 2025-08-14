@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: .
+    container_name: hosting_panel_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+    restart: unless-stopped
+    networks:
+      - frontend_network
+
+networks:
+  frontend_network:
+    driver: bridge
