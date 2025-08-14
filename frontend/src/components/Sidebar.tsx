@@ -28,6 +28,7 @@ const menuItems = [
   { name: 'Websites', href: '/websites', icon: Globe },
   { name: 'Databases', href: '/databases', icon: Database },
   { name: 'Docker', href: '/docker', icon: Box },
+  { name: 'Files', href: '/files', icon: FileText },
   { name: 'System', href: '/system', icon: Server },
   { name: 'Users', href: '/users', icon: Users },
   { name: 'Security', href: '/security', icon: Shield },
