@@ -46,6 +46,7 @@ services:
   hosting_panel:
     build: .
     container_name: hosting_panel_app
+    env_file: env.example
     environment:
       # Database settings
       DATABASE_URL: postgresql://hosting_user:hosting_password_123@postgres:5432/hosting_panel
@@ -61,7 +62,7 @@ services:
       # Security (change these in production!)
       SECRET_KEY: your-super-secret-key-change-this-in-production
       ADMIN_USERNAME: admin
-      ADMIN_EMAIL: admin@localhost
+      ADMIN_EMAIL: admin@localhost.com
       ADMIN_PASSWORD: admin123
       
       # File paths (container paths)
@@ -72,12 +73,12 @@ services:
       DOCKER_ENABLED: true
       DOCKER_SOCKET: /var/run/docker.sock
       
-      # CORS
-      ALLOWED_HOSTS: "*"
+      # CORS - Allow all origins for simplicity
+      ALLOWED_HOSTS: '["*"]'
       
       # Web server settings
       WEB_SERVER: nginx
-      PHP_VERSIONS: "7.4,8.0,8.1,8.2"
+      PHP_VERSIONS: '["7.4","8.0","8.1","8.2"]'
       DEFAULT_PHP_VERSION: "8.1"
       
       # SSL settings

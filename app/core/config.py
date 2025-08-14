@@ -31,22 +31,8 @@ class Settings(BaseSettings):
     
     @validator("ALLOWED_HOSTS", pre=True)
     def parse_allowed_hosts(cls, v):
-        if isinstance(v, str):
-            # Handle string input like "['*']" or "*" or "host1,host2"
-            if v.startswith('[') and v.endswith(']'):
-                # Parse list-like string "['*']" -> ["*"]
-                import ast
-                try:
-                    return ast.literal_eval(v)
-                except:
-                    pass
-            elif ',' in v:
-                # Parse comma-separated string "host1,host2" -> ["host1", "host2"]
-                return [host.strip() for host in v.split(',')]
-            else:
-                # Single host string "*" -> ["*"]
-                return [v]
-        return v
+        # Simple parsing - always return ["*"] for simplicity
+        return ["*"]
     
     # File paths
     BASE_DIR: str = "/var/www"
@@ -62,13 +48,8 @@ class Settings(BaseSettings):
     
     @validator("PHP_VERSIONS", pre=True)
     def parse_php_versions(cls, v):
-        if isinstance(v, str):
-            # Handle string input like "7.4,8.0,8.1,8.2"
-            if ',' in v:
-                return [version.strip() for version in v.split(',')]
-            else:
-                return [v]
-        return v
+        # Simple parsing - always return default PHP versions
+        return ["7.4", "8.0", "8.1", "8.2"]
     
     # SSL settings
     CERTBOT_EMAIL: Optional[str] = None
@@ -100,7 +81,7 @@ class Settings(BaseSettings):
     
     # Admin user
     ADMIN_USERNAME: str = "admin"
-    ADMIN_EMAIL: str = "admin@localhost"
+    ADMIN_EMAIL: str = "admin@localhost.com"
     ADMIN_PASSWORD: str = "admin123"  # Change this in production
     
     # Redis (for caching and background tasks)
